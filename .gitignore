@@ -1,0 +1,44 @@
+# Archivos compilación Latex
+
+*.aux
+*.toc
+*.log
+*.gz
+
+# Archivos temporales
+*~
+*.tmp
+
+# Archivos editor
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+
+# Archivos de entorno
+/client/.env
+
+# Dependencias de Python
+/server/__pycache__/
+.server/.env
+
+# Archivos de configuración de IDEs
+*.idea/
+*.vscode/
+
+# Archivos de SO
+.DS_Store
+Thumbs.db
+
+
+
+
