@@ -4,7 +4,9 @@
 *.toc
 *.log
 *.gz
-
+*.fls
+*.fdb_latexmk
+*.out
 # Archivos temporales
 *~
 *.tmp
