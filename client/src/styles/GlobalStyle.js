@@ -8,9 +8,10 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #f0f2f5;
     color: #333;
+    line-height: 1.6;
   }
 
   a {
@@ -24,6 +25,20 @@ const GlobalStyle = createGlobalStyle`
 
   button {
     font-family: inherit;
+    cursor: pointer;
+  }
+
+  input, button {
+    outline: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
   }
 `;
 
