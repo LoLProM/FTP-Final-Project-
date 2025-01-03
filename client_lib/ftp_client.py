@@ -35,6 +35,7 @@ class FTPClient:
         self._get_response()
         with open(file_path, 'rb') as file:
             self.sock.sendfile(file)
+        self._get_response()
         print(f"Archivo {file_path} subido exitosamente. Tamaño: {file_size} bytes.")
 
     def download_file(self, file_name, dest_path):
@@ -46,6 +47,7 @@ class FTPClient:
                 if not data:
                     break
                 file.write(data)
+        self._get_response()
         print(f"Archivo {file_name} descargado exitosamente a {dest_path}.")
 
     def list_files(self):
