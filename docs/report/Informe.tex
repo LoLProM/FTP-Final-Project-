@@ -46,21 +46,21 @@ framerule=1pt
 \graphicspath{{./}}
 
 \begin{center}
-\text{\huge \textbf{Informe del Proyecto Final} }\\
+\textrm{\huge \textbf{Informe del Proyecto Final} }\\
 \vspace {0.5cm}
-\text{\huge \textbf{de}}\\
+\textrm{\huge \textbf{de}}\\
 \vspace {0.5cm}
-\text{\huge \textbf{Redes de Computadoras}}\\
+\textrm{\huge \textbf{Redes de Computadoras}}\\
 \vspace {5cm}
-\text{\huge Richard Alejandro Matos Arderí}\\
-\text{\huge Mauricio Sunde Jiménez}\\
+\textrm{\huge Richard Alejandro Matos Arderí}\\
+\textrm{\huge Mauricio Sunde Jiménez}\\
 \vspace {1cm}
 \vspace {2cm}
-\text{\Large Grupo 311, Ciencia de la Computación.}\\
+\textrm{\Large Grupo 311, Ciencia de la Computación.}\\
 \vspace {0.5cm}
-\text{\Large Facultad de Matemática y Computación}\\
+\textrm{\Large Facultad de Matemática y Computación}\\
 \vspace {0.5cm}
-\text{\Large Universidad de La Habana.}\\
+\textrm{\Large Universidad de La Habana.}\\
 \vspace {0.5cm}
 \begin{figure}[h]
     \centering
@@ -82,6 +82,223 @@ El Protocolo de Transferencia de Archivos (FTP, por sus siglas en inglés) es un
 FTP opera en un modelo cliente-servidor, donde el cliente inicia la conexión y el servidor responde a las solicitudes del cliente. El protocolo utiliza dos canales de comunicación: un canal de control para enviar comandos y recibir respuestas, y un canal de datos para la transferencia de archivos.
 
 FTP fue especificado por primera vez en 1971 y ha evolucionado a lo largo de los años. La versión más utilizada del protocolo está definida en el RFC 959, publicado en 1985.
+El servicio FTP es ofrecido por la capa de aplicación del modelo de capas de red TCP/IP al usuario, utilizando normalmente el puerto de red 20 y el 21. Un problema básico de FTP es que está pensado para ofrecer la máxima velocidad en la conexión, pero no la máxima seguridad, ya que todo el intercambio de información, desde el login y password del usuario en el servidor hasta la transferencia de cualquier archivo, se realiza en texto plano sin ningún tipo de cifrado, con lo que un posible atacante puede capturar este tráfico, acceder al servidor y/o apropiarse de los archivos transferidos.
+
+Para solucionar este problema son de gran utilidad aplicaciones como SCP y SFTP, incluidas en el paquete SSH, que permiten transferir archivos pero cifrando todo el tráfico.
+\subsection{Servidor FTP}
+
+Un servidor FTP es un programa especial que se ejecuta en un equipo servidor normalmente conectado a Internet (aunque puede estar conectado a otros tipos de redes, LAN, MAN, etc.). Su función es permitir el intercambio de datos entre diferentes servidores/ordenadores.
+
+Por lo general, los programas servidores FTP no suelen encontrarse en los ordenadores personales, por lo que un usuario normalmente utilizará el FTP para conectarse remotamente a uno y así intercambiar información con él.
+
+Las aplicaciones más comunes de los servidores FTP suelen ser el alojamiento web, en el que sus clientes utilizan el servicio para subir sus páginas web y sus archivos correspondientes; o como servidor de backup (copia de seguridad) de los archivos importantes que pueda tener una empresa. Para ello, existen protocolos de comunicación FTP para que los datos se transmitan cifrados, como el SFTP (Secure File Transfer Protocol).
+
+\textbf{Ejemplos de Servidores}
+
+\begin{itemize}
+    \item Titan FTP Server
+    \item WS\_FTP Server
+\end{itemize}
+
+\subsection{Cliente FTP}
+Cuando un navegador no está equipado con la función FTP, o si se quiere cargar archivos en un ordenador remoto, se necesitará utilizar un programa cliente FTP. Un cliente FTP es un programa que se instala en el ordenador del usuario, y que emplea el protocolo FTP para conectarse a un servidor FTP y transferir archivos, ya sea para descargarlos o para subirlos.
+
+Para utilizar un cliente FTP, se necesita conocer el nombre del archivo, el ordenador en que reside (servidor, en el caso de descarga de archivos), el ordenador al que se quiere transferir el archivo (en caso de querer subirlo nosotros al servidor), y la carpeta en la que se encuentra.
+
+Algunos clientes de FTP básicos en modo consola vienen integrados en los sistemas operativos, incluyendo Microsoft Windows, DOS, GNU/Linux y Unix. Sin embargo, hay disponibles clientes con opciones añadidas e interfaz gráfica. Aunque muchos navegadores tienen ya integrado FTP, es más confiable a la hora de conectarse con servidores FTP no anónimos utilizar un programa cliente.
+
+\subsubsection{Acceso anónimo}
+
+Los servidores FTP anónimos ofrecen sus servicios libremente a todos los usuarios, permiten acceder a sus archivos sin necesidad de tener un 'USER ID' o una cuenta de usuario. Es la manera más cómoda fuera del servicio web de permitir que todo el mundo tenga acceso a cierta información sin que para ello el administrador de un sistema tenga que crear una cuenta para cada usuario.
+
+Si un servidor posee servicio 'FTP anonymous' solamente con teclear la palabra «anonymous», cuando pregunte por tu usuario tendrás acceso a ese sistema. No se necesita ninguna contraseña preestablecida, aunque tendrás que introducir una solo para ese momento, normalmente se suele utilizar la dirección de correo electrónico propia.
+
+Solamente con eso se consigue acceso a los archivos del FTP, aunque con menos privilegios que un usuario normal. Normalmente solo podrás leer y copiar los archivos que sean públicos, así indicados por el administrador del servidor al que nos queramos conectar.
+
+Normalmente, se utiliza un servidor FTP anónimo para depositar grandes archivos que no tienen utilidad si no son transferidos a la máquina del usuario, como por ejemplo programas, y se reservan los servidores de páginas web (HTTP) para almacenar información textual destinada a la lectura en línea.
+
+\subsubsection{Acceso de usuario}
+Si se desea tener privilegios de acceso a cualquier parte del sistema de archivos del servidor FTP, de modificación de archivos existentes, y de posibilidad de subir nuestros propios archivos, generalmente se suele realizar mediante una cuenta de usuario. En el servidor se guarda la información de las distintas cuentas de usuario que pueden acceder a él, de manera que para iniciar una sesión FTP debemos introducir una autentificación (en inglés: login) y una contraseña (en inglés: password) que nos identifica unívocamente.
+
+\subsubsection{Cliente FTP basado en Web}
+
+
+Un «cliente FTP basado en Web» no es más que un cliente FTP al cual podemos acceder a través de nuestro navegador web sin necesidad de tener otra aplicación para ello. El usuario se conecta mediante HTTP a un servidor web, y el servidor web se conecta mediante FTP al servidor de archivos. El servidor web actúa de intermediario haciendo pasar la información desde el servidor FTP en los puertos 20 y 21 hacia el puerto 80 HTTP que ve el usuario.
+
+Siempre hay momentos en que nos encontramos fuera de casa, no llevamos el ordenador portátil encima y necesitamos realizar alguna tarea urgente desde un ordenador de acceso público, de un amigo, del trabajo, la universidad, etc. Lo más común es que no estén instaladas las aplicaciones que necesitamos y en muchos casos hasta carecemos de los permisos necesarios para realizar su instalación. Otras veces estamos detrás de un proxy o cortafuegos que no nos permite acceder a servidores FTP externos.
+
+Al disponer de un cliente FTP basado en Web podemos acceder al servidor FTP remoto como si estuviéramos realizando cualquier otro tipo de navegación web. A través de un cliente FTP basado en Web podrás, crear, copiar, renombrar y eliminar archivos y directorios. Cambiar permisos, editar, ver, subir y descargar archivos, así como cualquier otra función del protocolo FTP que el servidor FTP remoto permita.
+\subsubsection{Acceso de invitado}
+
+El acceso sin restricciones al servidor que proporcionan las cuentas de usuario implica problemas de seguridad, lo que ha dado lugar a un tercer tipo de acceso FTP denominado invitado (guest), que se puede contemplar como una mezcla de los dos anteriores.
+
+La idea de este mecanismo es la siguiente: se trata de permitir que cada usuario conecte a la máquina mediante su login y su password, pero evitando que tenga acceso a partes del sistema de archivos que no necesita para realizar su trabajo, de esta forma accederá a un entorno restringido, algo muy similar a lo que sucede en los accesos anónimos, pero con más privilegios.
+
+
+\subsubsection{Ejemplos de Clientes FTP}
+
+\begin{itemize}
+    \item net2ftp
+    \item WebDrive
+    \item Web-Ftp
+    \item Jambai FTP
+    \item ftp4net
+    \item PHP FTP Client
+    \item Asuk PHP FTP
+    \item Weeble File Manager
+    \item FileZilla
+    \item Transmit
+\end{itemize}
+
+\subsection{Modos de Conexión del cliente FTP}
+FTP admite dos modos de conexión del cliente. Estos modos se denominan activo (o Estándar, o PORT, debido a que el cliente envía comandos tipo PORT al servidor por el canal de control al establecer la conexión) y pasivo (o PASV, porque en este caso envía comandos tipo PASV). Tanto en el modo Activo como en el modo Pasivo, el cliente establece una conexión con el servidor mediante el puerto 21, que establece el canal de control.
+
+\subsubsection*{Modo activo}
+
+
+En modo Activo, el servidor siempre crea el canal de datos en su puerto 20, mientras que en el lado del cliente el canal de datos se asocia a un puerto aleatorio mayor que el 1024. Para ello, el cliente manda un comando PORT al servidor por el canal de control indicándole ese número de puerto, de manera que el servidor pueda abrirle una conexión de datos por donde se transferirán los archivos y los listados, en el puerto especificado.
+
+Lo anterior tiene un grave problema de seguridad, y es que la máquina cliente debe estar dispuesta a aceptar cualquier conexión de entrada en un puerto superior al 1024, con los problemas que ello implica si tenemos el equipo conectado a una red insegura como Internet. De hecho, los cortafuegos que se instalen en el equipo para evitar ataques seguramente rechazarán esas conexiones aleatorias. Para solucionar esto se desarrolló el modo pasivo. Aunque realmente no es así ya que seguramente la seguridad tendrá un problema grave.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../images/Modo_activo.png}
+    \label{fig:modo_activo}
+\end{figure}
+
+\subsubsection*{Modo pasivo}
+
+
+Cuando el cliente envía un comando PASV sobre el canal de control, el servidor FTP le indica por el canal de control, el puerto (mayor a 1024 del servidor. Ejemplo:2040) al que debe conectarse el cliente. El cliente inicia una conexión desde el puerto siguiente al puerto de control (Ejemplo: 1036) hacia el puerto del servidor especificado anteriormente (Ejemplo: 2040).
+
+Antes de cada nueva transferencia tanto en el modo Activo como en el Pasivo, el cliente debe enviar otra vez un comando de control (PORT o PASV, según el modo en el que haya conectado), y el servidor recibirá esa conexión de datos en un nuevo puerto (aleatorio si es en modo pasivo o por el puerto 20 si es en modo activo).
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../images/Modo_pasivo.png}
+    \label{fig:modo_pasivo}
+\end{figure}
+\newpage
+
+\subsection{Tipos de transferencia de archivos en FTP}
+En el protocolo FTP existen 2 tipos de transferencia en ASCII y en binarios. Es importante conocer cómo debemos transportar un archivo a lo largo de la red, si no utilizamos las opciones adecuadas podemos destruir la información del archivo. Por eso, al ejecutar la aplicación FTP, debemos acordarnos de utilizar uno de estos comandos (o poner la correspondiente opción en un programa con interfaz gráfica):
+
+\subsubsection{Tipo ASCII}
+Adecuado para transferir archivos que solo contengan caracteres imprimibles (archivos ASCII, no archivos resultantes de un procesador de texto), por ejemplo páginas HTML, pero no las imágenes que puedan contener. Se transforman algunos símbolos de control para mantenerlos compatibles entre diferentes sistemas, por ejemplo, si el archivo está alojado sobre un servidor linux, el salto de línea para los archivos de texto es $"\textbackslash n"$ (byte 10 en decimal). Si el cliente es un sistema Mac, el salto de línea es $"\textbackslash r"$ (byte 13 en decimal), este modo cambia estos símbolos de control para que el archivo sea legible en ambos lados, al igual que si se envía a un sistema windows, el salto de línea es $"\textbackslash r\textbackslash n"$ (dos bytes, 13 y 10). Si se usa este modo en archivos que no son de texto plano, en el caso de intercambiarse entre diferentes sistemas, ese archivo quedará corrupto.
+
+\subsubsection{Tipo Binario}
+Este tipo es usado cuando se trata de archivos comprimidos, ejecutables para PC, imágenes, archivos de audio, entre otros.
+
+Ejemplos de cómo transferir algunos tipos de archivo dependiendo de su extensión:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Extensión de archivo} & \textbf{Tipo de transferencia} \\ \hline
+txt (texto) & ascii \\ \hline
+html (página WEB) & ascii \\ \hline
+doc (documento) & binario \\ \hline
+ps (poscript) & ascii \\ \hline
+hqx (comprimido) & ascii \\ \hline
+Z (comprimido) & binario \\ \hline
+ZIP (comprimido) & binario \\ \hline
+ZOO (comprimido) & binario \\ \hline
+Sit (comprimido) & binario \\ \hline
+pit (comprimido) & binario \\ \hline
+shar (comprimido) & binario \\ \hline
+uu (comprimido) & binario \\ \hline
+ARC (comprimido) & binario \\ \hline
+tar (empaquetado) & binario \\ \hline
+\end{tabular}
+\caption{Tipos de transferencia según la extensión del archivo}
+\label{tab:tipos_transferencia}
+\end{table}
+
+En la red existen diversas soluciones de software que desarrollan este tipo de tecnología, los más conocidos, son Filezilla (software libre) y CuteFTP (shareware).
+
+\subsection{Comandos FTP}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Comando y argumentos} & \textbf{Acción que realiza} \\ \hline
+\textbf{open} \textit{puerta} & Inicia una conexión con un servidor FTP. \\ \hline
+\textbf{close} o \textbf{disconnect} & Finaliza una conexión FTP sin cerrar el programa cliente. \\ \hline
+\textbf{bye} o \textbf{quit} & Finaliza una conexión FTP y la sesión de trabajo con el programa cliente. \\ \hline
+\textbf{cd} \textit{directorio} & Cambia el directorio de trabajo en el servidor. \\ \hline
+\textbf{delete} \textit{archivo} & Borra un archivo en el servidor. \\ \hline
+\textbf{mdelete} \textit{patrón} & Borra múltiples archivos basado en un patrón que se aplica al nombre. \\ \hline
+\textbf{dir} & Muestra el contenido del directorio en el que estamos en el servidor. \\ \hline
+\textbf{get} \textit{archivo} & Obtiene un archivo. \\ \hline
+\textbf{noop} No Operation & Se le comunica al servidor que el cliente está en modo de no operación. \\ \hline
+\textbf{mget} \textit{archivos} & Obtiene múltiples archivos. \\ \hline
+\textbf{hash} & Activa la impresión de caracteres \# a modo de barra de progreso. \\ \hline
+\textbf{lcd} \textit{directorio} & Cambia el directorio de trabajo local. \\ \hline
+\textbf{ls} & Muestra el contenido del directorio en el servidor. \\ \hline
+\textbf{prompt} & Activa/desactiva la confirmación de comandos. \\ \hline
+\textbf{put} \textit{archivo} & Envía un archivo al directorio activo del servidor. \\ \hline
+\textbf{mput} \textit{archivos} & Envía múltiples archivos. \\ \hline
+\textbf{pwd} & Muestra el directorio activo en el servidor. \\ \hline
+\textbf{rename} \textit{archivo} & Cambia el nombre a un archivo en el servidor. \\ \hline
+\textbf{rmdir} \textit{directorio} & Elimina un directorio en el servidor si está vacío. \\ \hline
+\textbf{status} & Muestra el estado actual de la conexión. \\ \hline
+\textbf{bin} o \textbf{binary} & Activa el modo de transferencia binario. \\ \hline
+\textbf{ascii} & Activa el modo de transferencia en modo texto ASCII. \\ \hline
+\textbf{!} & Permite salir a línea de comandos temporalmente sin cortar la conexión. \\ \hline
+\textbf{?} \textit{nombre de comando} & Muestra la información relativa al comando. \\ \hline
+\textbf{?} o \textbf{help} & Muestra una lista de los comandos disponibles. \\ \hline
+\textbf{append} \textit{nombre del archivo} & Continua una descarga que se ha cortado previamente. \\ \hline
+\textbf{bell} & Activa/desactiva la reproducción de un sonido al terminar una transferencia. \\ \hline
+\textbf{glob} & Activa/desactiva la visualización de nombres largos de nuestro PC. \\ \hline
+\textbf{literal} & Ejecuta comandos del servidor de forma remota. \\ \hline
+\textbf{mkdir} & Crea el directorio indicado de forma remota. \\ \hline
+\textbf{quote} & Hace la misma función que literal. \\ \hline
+\textbf{send} \textit{nombre del archivo} & Envía el archivo indicado al directorio activo del servidor. \\ \hline
+\textbf{user} & Cambia el nombre de usuario y contraseña sin salir de la sesión FTP. \\ \hline
+\end{tabular}
+\caption{Comandos FTP y sus acciones}
+\label{tab:comandos_ftp}
+\end{table}
+
+\subsection{Códigos de respuesta de FTP}
+A continuación se muestra un resumen de los códigos de respuesta FTP que pueden ser devueltos por un servidor FTP. Estos códigos se han estandarizado en el RFC 959 por la IETF. El código de respuesta es un valor de tres dígitos. El primer dígito se utiliza para indicar uno de tres posibles resultados: éxito, fracaso o para indicar un error o una respuesta incompleta:
+
+\begin{itemize}
+    \item \textbf{2yz} - Respuesta de éxito.
+    \item \textbf{4yz} o \textbf{5yz} - No hay respuesta.
+    \item \textbf{1yz} o \textbf{3yz} - Un error o una respuesta incompleta.
+\end{itemize}
+
+El segundo dígito define la clase de error:
+
+\begin{itemize}
+    \item \textbf{x0z} - Sintaxis. Estas respuestas se refieren a errores de sintaxis.
+    \item \textbf{x1z} - Información. Las respuestas a las solicitudes de información.
+    \item \textbf{x2z} - Conexiones. Respuestas en referencia al control y las conexiones de datos.
+    \item \textbf{x3z} - Autenticación y contabilidad. Respuestas para el proceso de inicio de sesión y los procedimientos contables.
+    \item \textbf{x4z} - No definido.
+    \item \textbf{x5z} - Sistema de archivos. Estas respuestas transmiten códigos de estado del sistema de archivos del servidor.
+\end{itemize}
+
+El tercer dígito del código de respuesta se utiliza para proporcionar detalles adicionales para cada una de las categorías definidas por el segundo dígito.
+
+
+
+\subsection{Conexión a un servidor FTP protegido desde navegador}
+Para iniciar sesión en un servidor FTP que requiere una contraseña, teclee la URL de esta forma:
+
+\begin{verbatim}
+ftp://<usuario>:<contraseña>@<servidor ftp>/<url-ruta>
+\end{verbatim}
+
+Donde \texttt{<usuario>} es el nombre de usuario, \texttt{<contraseña>} es la contraseña de acceso, \texttt{<servidor ftp>} es el servidor FTP, y \texttt{<url-ruta>} es el directorio donde iniciamos sesión.
+
+Ejemplo:
+\begin{verbatim}
+ftp://alumno:alumnopass@ftp.example.com/public
+\end{verbatim}
+
 
 \section{RFC 959: Especificaciones del Protocolo FTP}
 El RFC 959, titulado "File Transfer Protocol (FTP)", es un documento que especifica las reglas y estándares para la implementación del protocolo FTP. Fue publicado en octubre de 1985 por Jon Postel y Joyce Reynolds como parte de la serie de Request for Comments (RFC) de la Internet Engineering Task Force (IETF).
@@ -122,6 +339,7 @@ Además de los comandos básicos, el RFC 959 especifica una serie de comandos ad
 El RFC 959 también aborda aspectos de seguridad, aunque de manera limitada. Por ejemplo, menciona la necesidad de proteger las credenciales de usuario (nombre de usuario y contraseña) durante la autenticación, pero no especifica mecanismos de cifrado. En la práctica, se utilizan extensiones como FTPS (FTP sobre SSL/TLS) y SFTP (FTP sobre SSH) para proporcionar seguridad adicional.
 
 Para más información sobre el RFC 959, se puede consultar el documento completo en el sitio web de la IETF: \url{https://tools.ietf.org/html/rfc959}.
+
 
 \section{Estructura del Proyecto}
 El proyecto está organizado en dos partes principales: el cliente FTP y el servidor FTP. Cada parte está implementada en su propio directorio y contiene varios módulos para manejar diferentes aspectos de la funcionalidad.
