@@ -28,6 +28,7 @@
 
 # Archivos de entorno
 /client/.env
+/client_lib/__pycache__/
 
 # Dependencias de Python
 /server/__pycache__/
