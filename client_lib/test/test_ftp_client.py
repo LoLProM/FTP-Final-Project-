@@ -28,7 +28,9 @@ class TestFTPClient(unittest.TestCase):
 
     def test_upload_file(self):
         self.ftp_client.put(self.test_file_name)
-        # Aquí se puede agregar lógica para verificar que el archivo se subió correctamente
+        # verificar que el archivo se subió correctamente
+        files = self.ftp_client.ls()
+        self.assertIn(self.test_file_name, files)
 
     def test_download_file(self):
         download_path = 'downloaded_test_file.txt'
