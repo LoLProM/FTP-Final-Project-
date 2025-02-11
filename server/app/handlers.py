@@ -683,16 +683,34 @@ def handle_stru(ftp_server, client_socket, args):
         client_socket.send(b"504 Structure not supported\r\n")
 
 def handle_mode(ftp_server, client_socket, args):
+    """
+    Handles the MODE command for the FTP server.
+    The MODE command specifies the data transfer modes as described in the Transmission Modes section.
+    The following codes are assigned for transfer modes:
+        S - Stream
+        B - Block
+        C - Compressed
+    Args:
+        ftp_server: The FTP server instance.
+        client_socket: The client socket to send responses to.
+        args: A list of arguments provided with the MODE command.
+    Returns:
+        None. Sends a response to the client socket.
+    Response Codes:
+        200: Mode set successfully.
+        501: Syntax error in parameters or arguments.
+        504: Command not implemented for that parameter.
+    """
     if not args or len(args) > 1:
-        client_socket.send(b"501 Sintaxis: MODE {S,B,C}\r\n")
+        client_socket.send(b"501 Syntax: MODE {S,B,C}\r\n")
         return
     
     mode_code = args[0].upper()
     if mode_code in ['S', 'B', 'C']:
         ftp_server.mode = mode_code
-        client_socket.send(f"200 Modo establecido a {ftp_server.modes[mode_code]}\r\n".encode())
+        client_socket.send(f"200 Mode set to {ftp_server.modes[mode_code]}\r\n".encode())
     else:
-        client_socket.send(b"504 Modo no soportado\r\n")
+        client_socket.send(b"504 Mode not supported\r\n")
 
 def handle_retr(ftp_server, client_socket, args):
     """
@@ -739,14 +757,28 @@ def handle_retr(ftp_server, client_socket, args):
         client_socket.send(b"550 Error al leer archivo\r\n")
 
 def handle_stor(ftp_server, client_socket, args):
+    """
+    Handles the STOR command from the FTP client to store a file on the server.
+    Parameters:
+    ftp_server (FTPServer): The FTP server instance handling the request.
+    client_socket (socket.socket): The socket connected to the FTP client.
+    args (list): A list of arguments provided with the STOR command. Should contain the filename.
+    Returns:
+    None
+    Sends the following response codes to the client:
+    - 150: Ready to receive data.
+    - 226: Transfer complete.
+    - 501: Syntax error in parameters or arguments.
+    - 550: Requested action not taken. File unavailable or error storing file.
+    """
     if not args or len(args) > 1:
-        client_socket.send(b"501 Sintaxis: STOR filename\r\n")
+        client_socket.send(b"501 Syntax: STOR filename\r\n")
         return
 
     try:
         file_path = ftp_server.current_dir / Path(args[0]).name
 
-        client_socket.send(b"150 Listo para recibir datos\r\n")
+        client_socket.send(b"150 Ready to receive data\r\n")
 
         data_socket, _ = ftp_server.pasv_socket.accept()
 
@@ -758,37 +790,71 @@ def handle_stor(ftp_server, client_socket, args):
                     break
                 f.write(data)
 
-        client_socket.send(b"226 Transferencia completa\r\n")
+        client_socket.send(b"226 Transfer complete\r\n")
 
     except Exception as e:
-        print(f"Error en STOR: {e}")
-        client_socket.send(b"550 Error al almacenar archivo\r\n")
+        print(f"Error in STOR: {e}")
+        client_socket.send(b"550 Error storing file\r\n")
 
     finally:
         if data_socket:
             data_socket.close()
 
 def handle_stou(ftp_server, client_socket, args):
+    """
+    Handle the STOU (Store Unique) FTP command.
+
+    This command is used to store a file on the server with a unique name.
+    If arguments are provided, it sends a syntax error response to the client.
+    Otherwise, it creates a temporary file in the current directory of the FTP server
+    and sends the unique name of the file to the client.
+
+    Args:
+        ftp_server (FTPServer): The FTP server instance handling the request.
+        client_socket (socket): The socket connected to the client.
+        args (str): The arguments provided with the STOU command.
+
+    Responses:
+        250: File will be stored with a unique name.
+        501: Syntax error in parameters or arguments.
+        550: Requested action not taken. File storage error.
+    """
     if args:
-        client_socket.send(b"501 Sintaxis invalida\r\n")
+        client_socket.send(b"501: Syntax error in parameters or arguments\r\n")
         return
     try:
         temp_file = tempfile.NamedTemporaryFile(delete=False, dir=ftp_server.current_dir)
         temp_name = Path(temp_file.name).name
-        client_socket.send(f"250 Archivo será almacenado como {temp_name}\r\n".encode())
+        client_socket.send(f"250 File will be stored as {temp_name}\r\n".encode())
         temp_file.close()
     except:
-        client_socket.send(b"550 Error al almacenar archivo\r\n")
+        client_socket.send(b"550 Error storing file\r\n")
 
 def handle_appe(ftp_server, client_socket, args):
+    """
+    Handles the FTP APPE (append) command from the client.
+    This function allows the client to append data to an existing file on the server.
+    If the file does not exist, it creates a new file and writes the data to it.
+    Args:
+        ftp_server (FTPServer): The FTP server instance handling the connection.
+        client_socket (socket.socket): The socket connected to the client.
+        args (list): A list of arguments passed with the APPE command. It should contain the filename.
+    Returns:
+        None
+    Sends appropriate FTP response codes to the client based on the success or failure of the operation:
+        - 501 if the syntax of the command is incorrect.
+        - 150 if the server is ready to receive data.
+        - 226 if the file transfer is complete.
+        - 550 if there is an error appending to the file.
+    """
     if not args or len(args) > 1:
-        client_socket.send(b"501 Sintaxis: APPE filename\r\n")
+        client_socket.send(b"501 Syntax: APPE filename\r\n")
         return
     try:
         file_path = ftp_server.current_dir / Path(args[0]).name
         mode = 'ab' if file_path.exists() else 'wb'
         
-        client_socket.send(b"150 Listo para recibir datos\r\n")
+        client_socket.send(b"150 Ready to receive data\r\n")
         
         data_socket, _ = ftp_server.pasv_socket.accept()
 
@@ -800,12 +866,37 @@ def handle_appe(ftp_server, client_socket, args):
                     break
                 f.write(data)
         
-        client_socket.send(b"226 Transferencia completa\r\n")
+        client_socket.send(b"226 Transfer complete\r\n")
     except:
-        client_socket.send(b"550 Error al anexar al archivo\r\n")
+        client_socket.send(b"550 Error appending to file\r\n")
 
 def handle_allo(ftp_server, client_socket, args):
-    client_socket.send(b"200 ALLO no necesario\r\n")
+    """
+    Handle the ALLO (Allocate) command for the FTP server.
+
+    This command may be required by some servers to reserve sufficient storage to accommodate the new file to be transferred.
+    The argument will be a decimal integer representing the number of bytes (using the logical byte size) of storage to be reserved for the file.
+    For files sent with record or page structure, a maximum record or page size (in logical bytes) may also be needed; this is indicated by a decimal integer in a second argument field of the command.
+    This second argument is optional, but when present, it must be separated from the first by the three Telnet characters <SP> R <SP>.
+    This command should be followed by a STORe or APPEnd command.
+    The ALLO command should be treated as a NOOP (no operation) by those servers that do not require the maximum file size to be declared in advance, and those servers interested only in the maximum record or page size should accept a dummy value in the first argument and ignore it.
+
+    Args:
+        ftp_server (FTPServer): The FTP server instance handling the request.
+        client_socket (socket.socket): The socket connected to the FTP client.
+        args (list): A list of arguments provided with the ALLO command.
+
+    Returns:
+        None: Sends a response to the client indicating the result of the ALLO command.
+        - "200 ALLO command okay\r\n" if the command is successfully processed.
+        - "501 Syntax error in parameters or arguments\r\n" if the arguments are invalid.
+    """
+    if not args or len(args) > 2:
+        client_socket.send(b"501 Syntax error in parameters or arguments\r\n")
+        return
+
+    # Treat ALLO as NOOP since pre-allocation is not required
+    client_socket.send(b"200 ALLO command okay\r\n")
 
 def handle_rest(ftp_server, client_socket, args):
     client_socket.send(b"502 REST no implementado\r\n")
@@ -824,6 +915,24 @@ def handle_stat(ftp_server, client_socket, args):
     client_socket.send(response.encode())
 
 def handle_nlst(ftp_server, client_socket, args):
+    """
+    Handle the NLST (Name List) FTP command.
+    This function processes the NLST command, which lists the files in the 
+    current directory or a specified directory on the FTP server.
+    Parameters:
+    ftp_server (FTPServer): The instance of the FTP server handling the request.
+    client_socket (socket.socket): The socket connected to the client.
+    args (list): A list of arguments provided with the NLST command. It can be empty or contain one directory path.
+    Behavior:
+    - If more than one argument is provided, it sends a "501 Syntax error" response to the client.
+    - If no arguments or one argument is provided, it attempts to list the files in the current directory or the specified directory.
+    - Sends a "150 Opening data connection" response before starting the file transfer.
+    - Sends the list of files over a data connection.
+    - Sends a "226 Transfer complete" response after successfully listing the files.
+    - In case of an error, it sends a "550 Error listing files" response to the client and logs the error.
+    Exceptions:
+    - Catches all exceptions, logs the error, and sends a "550 Error listing files" response to the client.
+    """
     if args and len(args) > 1:
         client_socket.send(b"501 Sintaxis invalida\r\n")
         return
