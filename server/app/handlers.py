@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+import socket
 from pathlib import Path
 
 def handle_user(ftp_server, client_socket, args):
@@ -527,14 +528,37 @@ def handle_rein(ftp_server, client_socket, args):
     client_socket.send(b"220: Service ready for new user.\r\n")
 
 def handle_port(ftp_server, client_socket, args):
+    """
+    Handles the PORT command for the FTP server.
+    The PORT command specifies the data port to be used in the data connection.
+    The argument is a HOST-PORT specification for the data port. Normally, there
+    are default data ports for both the user and server, and under normal
+    circumstances, this command and its response are not needed. If this command
+    is used, the argument is the concatenation of a 32-bit internet host address
+    and a 16-bit TCP port address. This address information is broken into 8-bit
+    fields and the value of each field is transmitted as a decimal number (in
+    character string representation). The fields are separated by commas. A port
+    command would be: PORT h1,h2,h3,h4,p1,p2 where h1 is the high order 8 bits of
+    the internet host address.
+    Args:
+        ftp_server: The FTP server instance.
+        client_socket: The client socket to send responses to.
+        args: A list of arguments where the first element is the HOST-PORT specification.
+    Returns:
+        None
+    Sends:
+        200 Command okay if the PORT command is successful.
+        500 Syntax error, command unrecognized if there is an error in the command.
+        501 Syntax error in parameters or arguments if the arguments are invalid.
+    """
     if not args:
-        client_socket.send(b"501 Sintaxis: PORT h1,h2,h3,h4,p1,p2\r\n")
+        client_socket.send(b"501 Syntax: PORT h1,h2,h3,h4,p1,p2\r\n")
         return
 
     try:
         port_parts = args[0].split(',')
         if len(port_parts) != 6:
-            client_socket.send(b"501 Sintaxis invalida\r\n")
+            client_socket.send(b"501 Syntax error in parameters or arguments\r\n")
             return
 
         ip = ".".join(port_parts[:4])
@@ -543,12 +567,27 @@ def handle_port(ftp_server, client_socket, args):
         ftp_server.data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ftp_server.data_socket.connect((ip, port))
 
-        client_socket.send(b"200 Comando PORT exitoso\r\n")
+        client_socket.send(b"200 Command okay\r\n")
     except Exception as e:
         print(f"Error en PORT: {e}")
-        client_socket.send(b"500 Error en comando PORT\r\n")
+        client_socket.send(b"500 Error in command PORT\r\n")
 
 def handle_pasv(ftp_server, client_socket, args):
+    """
+    Handles the PASV (Passive Mode) command for the FTP server.
+    This command requests the server-DTP to "listen" on a data port (which is not its default data port) 
+    and wait for a connection instead of initiating one upon receiving a transfer command. 
+    The response to this command includes the host address and port on which the server is listening.
+    Args:
+        ftp_server: The FTP server instance.
+        client_socket: The client socket connected to the FTP server.
+        args: Additional arguments for the command (not used in this function).
+    Returns:
+        None
+    Response Codes:
+        227: Entering Passive Mode (success).
+        500: Error in passive mode (failure).
+    """
     try:
         if hasattr(ftp_server, 'pasv_socket'):
             ftp_server.pasv_socket.close()
@@ -564,30 +603,84 @@ def handle_pasv(ftp_server, client_socket, args):
         client_socket.send(response.encode())
     except Exception as e:
         print(f"Error en PASV: {e}")
-        client_socket.send(b"500 Error en modo pasivo\r\n")
+        client_socket.send(b"500: Error in passive mode\r\n")
 
 def handle_type(ftp_server, client_socket, args):
+    """
+    Handle the FTP TYPE command to specify the data representation type.
+
+    The argument specifies the type of representation as described in the 
+    Data Representation and Storage section. Several types require a second 
+    parameter. The first parameter is denoted by a single Telnet character, 
+    as is the second parameter for Format for ASCII and EBCDIC; the second 
+    parameter for local byte is a decimal integer to indicate byte size. 
+    Parameters are separated by a <SP> (Space, ASCII code 32).
+
+    The following codes are assigned for type:
+                             
+               A - ASCII |    | N - Non-print
+                         |    | T - Telnet format effectors
+               E - EBCDIC|    | C - Carriage control (ASA)
+               I - Image
+
+               L <byte size> - Local byte Byte size
+
+    The default representation type is ASCII Non-print. If the Format parameter 
+    is changed, and then only the first argument is changed, the Format reverts 
+    to the default value of Non-print.
+
+    Args:
+        ftp_server (FTPServer): The FTP server instance.
+        client_socket (socket): The client socket to send responses.
+        args (list): The list of arguments provided with the TYPE command.
+
+    Returns:
+        None
+
+    Response Codes:
+        200 - Type set to {type_code}
+        501 - Syntax: TYPE {A,E,I,L}
+        504 - Type not supported
+    """
     if not args or len(args) > 1:
-        client_socket.send(b"501 Sintaxis: TYPE {A,E,I,L}\r\n")
+        client_socket.send(b"501 Syntax: TYPE {A,E,I,L}\r\n")
         return
     type_code = args[0].upper()
     if type_code in ['A', 'E', 'I', 'L']:
         ftp_server.transfer_type = type_code
-        client_socket.send(f"200 Tipo establecido a {type_code}\r\n".encode())
+        client_socket.send(f"200 Type set to {type_code}\r\n".encode())
     else:
-        client_socket.send(b"504 Tipo no soportado\r\n")
+        client_socket.send(b"504 Type not supported\r\n")
 
 def handle_stru(ftp_server, client_socket, args):
+    """
+    Handle the STRU (File Structure) command for the FTP server.
+    The argument is a single Telnet character code that specifies the file structure as described in the Data Representation and Storage section.
+    The following codes are assigned for structure:
+        F - File (no record structure)
+        R - Record structure
+        P - Page structure
+    Args:
+        ftp_server: The FTP server instance.
+        client_socket: The socket connected to the client.
+        args: List of arguments passed with the STRU command.
+    Returns:
+        None
+    Response Codes:
+        200: Structure set successfully.
+        501: Syntax error in parameters or arguments.
+        504: Command not implemented for that parameter.
+    """
     if not args or len(args) > 1:
-        client_socket.send(b"501 Sintaxis: STRU {F,R,P}\r\n")
+        client_socket.send(b"501 Syntax: STRU {F,R,P}\r\n")
         return
 
     stru_code = args[0].upper()
     if stru_code in ['F', 'R', 'P']:
         ftp_server.structure = stru_code
-        client_socket.send(f"200 Estructura establecida a {ftp_server.structs[stru_code]}\r\n".encode())
+        client_socket.send(f"200 Structure set to {ftp_server.structs[stru_code]}\r\n".encode())
     else:
-        client_socket.send(b"504 Estructura no soportada\r\n")
+        client_socket.send(b"504 Structure not supported\r\n")
 
 def handle_mode(ftp_server, client_socket, args):
     if not args or len(args) > 1:
